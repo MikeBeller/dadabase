@@ -1,0 +1,42 @@
+<.header>
+  Listing Jokes
+  <:actions>
+    <.link patch={~p"/jokes/new"}>
+      <.button>New Joke</.button>
+    </.link>
+  </:actions>
+</.header>
+
+<.table
+  id="jokes"
+  rows={@streams.jokes}
+  row_click={fn {_id, joke} -> JS.navigate(~p"/jokes/#{joke}") end}
+>
+  <:col :let={{_id, joke}} label="Name"><%= joke.name %></:col>
+  <:col :let={{_id, joke}} label="Text"><%= joke.text %></:col>
+  <:action :let={{_id, joke}}>
+    <div class="sr-only">
+      <.link navigate={~p"/jokes/#{joke}"}>Show</.link>
+    </div>
+    <.link patch={~p"/jokes/#{joke}/edit"}>Edit</.link>
+  </:action>
+  <:action :let={{id, joke}}>
+    <.link
+      phx-click={JS.push("delete", value: %{id: joke.id}) |> hide("##{id}")}
+      data-confirm="Are you sure?"
+    >
+      Delete
+    </.link>
+  </:action>
+</.table>
+
+<.modal :if={@live_action in [:new, :edit]} id="joke-modal" show on_cancel={JS.patch(~p"/jokes")}>
+  <.live_component
+    module={DadabaseWeb.JokeLive.FormComponent}
+    id={@joke.id || :new}
+    title={@page_title}
+    action={@live_action}
+    joke={@joke}
+    patch={~p"/jokes"}
+  />
+</.modal>

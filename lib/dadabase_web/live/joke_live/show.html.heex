@@ -1,0 +1,27 @@
+<.header>
+  Joke <%= @joke.id %>
+  <:subtitle>This is a joke record from your database.</:subtitle>
+  <:actions>
+    <.link patch={~p"/jokes/#{@joke}/show/edit"} phx-click={JS.push_focus()}>
+      <.button>Edit joke</.button>
+    </.link>
+  </:actions>
+</.header>
+
+<.list>
+  <:item title="Name"><%= @joke.name %></:item>
+  <:item title="Text"><%= @joke.text %></:item>
+</.list>
+
+<.back navigate={~p"/jokes"}>Back to jokes</.back>
+
+<.modal :if={@live_action == :edit} id="joke-modal" show on_cancel={JS.patch(~p"/jokes/#{@joke}")}>
+  <.live_component
+    module={DadabaseWeb.JokeLive.FormComponent}
+    id={@joke.id}
+    title={@page_title}
+    action={@live_action}
+    joke={@joke}
+    patch={~p"/jokes/#{@joke}"}
+  />
+</.modal>
