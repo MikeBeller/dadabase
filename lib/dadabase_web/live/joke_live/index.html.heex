@@ -1,5 +1,6 @@
 <.header>
   Listing Jokes
+  <.input name="include_nsfk" phx-click="toggle_nsfk" type="checkbox" label="Include NSFK" checked={@show_nsfk} />
   <:actions>
     <.link patch={~p"/jokes/new"}>
       <.button>New Joke</.button>
@@ -14,6 +15,7 @@
 >
   <:col :let={{_id, joke}} label="Name"><%= joke.name %></:col>
   <:col :let={{_id, joke}} label="Text"><%= joke.text %></:col>
+  <:col :let={{_id, joke}} label="NSFK"><%= joke.nsfk %></:col>
   <:action :let={{_id, joke}}>
     <div class="sr-only">
       <.link navigate={~p"/jokes/#{joke}"}>Show</.link>

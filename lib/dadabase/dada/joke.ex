@@ -5,6 +5,7 @@ defmodule Dadabase.Dada.Joke do
   schema "jokes" do
     field :name, :string
     field :text, :string
+    field :nsfk, :boolean, default: false
 
     timestamps(type: :utc_datetime)
   end
@@ -12,7 +13,7 @@ defmodule Dadabase.Dada.Joke do
   @doc false
   def changeset(joke, attrs) do
     joke
-    |> cast(attrs, [:name, :text])
-    |> validate_required([:name, :text])
+    |> cast(attrs, [:name, :text, :nsfk])
+    |> validate_required([:name, :text, :nsfk])
   end
 end

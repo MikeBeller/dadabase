@@ -6,7 +6,8 @@ defmodule DadabaseWeb.JokeLive.Index do
 
   @impl true
   def mount(_params, _session, socket) do
-    {:ok, stream(socket, :jokes, Dada.list_jokes())}
+    socket = assign(socket, :show_nsfk, false)
+    {:ok, stream(socket, :jokes, Dada.fetch_jokes(false))}
   end
 
   @impl true
@@ -43,5 +44,13 @@ defmodule DadabaseWeb.JokeLive.Index do
     {:ok, _} = Dada.delete_joke(joke)
 
     {:noreply, stream_delete(socket, :jokes, joke)}
+  end
+
+  @impl true
+  def handle_event("toggle_nsfk", _, socket) do
+    show_nsfk = !socket.assigns.show_nsfk
+    socket = assign(socket, :show_nsfk, show_nsfk)
+    new_jokes = Dada.fetch_jokes(show_nsfk)
+    {:noreply, stream(socket, :jokes, new_jokes, reset: true)}
   end
 end

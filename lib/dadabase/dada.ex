@@ -9,6 +9,15 @@ defmodule Dadabase.Dada do
   alias Dadabase.Dada.Joke
 
   @doc """
+  Fetches the jokes for the main screen -- filtering out nsfk if needed.
+  """
+  def fetch_jokes(show_nsfk) do
+    query = from j in Joke,
+            where: ^show_nsfk or j.nsfk == false
+    Repo.all(query)
+  end
+
+  @doc """
   Returns the list of jokes.
 
   ## Examples

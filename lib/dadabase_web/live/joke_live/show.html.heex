@@ -1,5 +1,5 @@
 <.header>
-  Joke <%= @joke.id %>
+  Joke <%= @joke.id %>: <%= @joke.name %>
   <:subtitle>This is a joke record from your database.</:subtitle>
   <:actions>
     <.link patch={~p"/jokes/#{@joke}/show/edit"} phx-click={JS.push_focus()}>
@@ -11,6 +11,7 @@
 <.list>
   <:item title="Name"><%= @joke.name %></:item>
   <:item title="Text"><%= @joke.text %></:item>
+  <:item title="NSFK"><%= @joke.nsfk %></:item>
 </.list>
 
 <.back navigate={~p"/jokes"}>Back to jokes</.back>

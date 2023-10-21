@@ -20,7 +20,8 @@ defmodule DadabaseWeb.JokeLive.FormComponent do
         phx-submit="save"
       >
         <.input field={@form[:name]} type="text" label="Name" />
-        <.input field={@form[:text]} type="text" label="Text" />
+        <.input field={@form[:text]} type="textarea" cols="30" rows="5" label="Text" />
+        <.input field={@form[:nsfk]} type="checkbox" label="NSFK" />
         <:actions>
           <.button phx-disable-with="Saving...">Save Joke</.button>
         </:actions>

@@ -17,7 +17,7 @@ defmodule DadabaseWeb.Router do
   scope "/", DadabaseWeb do
     pipe_through :browser
 
-    get "/", PageController, :home
+    live "/", JokeLive.Index, :index
     live "/jokes", JokeLive.Index, :index
     live "/jokes/new", JokeLive.Index, :new
     live "/jokes/:id/edit", JokeLive.Index, :edit
