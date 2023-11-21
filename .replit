@@ -1,0 +1,20 @@
+hidden = [".iex.exs"]
+run = "mix phx.server"
+
+entrypoint = "mix.exs"
+
+[env]
+LC_ALL = "en_US.UTF-8"
+HEX_HOME = "$REPL_HOME/.hex"
+MIX_HOME = "$REPL_HOME/.mix"
+
+[nix]
+channel = "stable-22_11"
+
+[deployment]
+run = ["sh", "-c", "mix phx.server"]
+deploymentTarget = "cloudrun"
+
+[auth]
+pageEnabled = true
+buttonEnabled = false
