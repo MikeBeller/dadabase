@@ -1,25 +1,7 @@
 defmodule DadabaseWeb.Router do
   use DadabaseWeb, :router
 
-  def get_user_name_from_conn(conn) do
-    case Plug.Conn.get_req_header(conn, "x-replit-user-name") do
-      [fst | _rest] -> fst
-      _ -> "anonymous"
-    end
-  end
-
-  def check_replit_user(conn, opts) do
-    allowed_ids = Keyword.get(opts, :allowed_ids, [])
-    user_id = get_user_name_from_conn(conn)
-    IO.puts "user_id: #{user_id} -- allowed: #{inspect(allowed_ids)}"
-    if user_id in allowed_ids do
-      conn
-    else
-      conn
-      |> send_resp(401, "Unauthorized")
-      |> halt()
-    end
-  end
+  import DadabaseWeb.UserAuth
 
   pipeline :browser do
     plug :accepts, ["html"]
@@ -28,18 +10,15 @@ defmodule DadabaseWeb.Router do
     plug :put_root_layout, html: {DadabaseWeb.Layouts, :root}
     plug :protect_from_forgery
     plug :put_secure_browser_headers
+    plug :fetch_current_user
   end
 
   pipeline :api do
     plug :accepts, ["json"]
   end
 
-  pipeline :user_check do
-    plug :check_replit_user, allowed_ids: ["miketest3k"]
-  end
-
   scope "/", DadabaseWeb do
-    pipe_through [:browser,:user_check]
+    pipe_through [:browser]
 
     live "/", JokeLive.Index, :index
     live "/jokes", JokeLive.Index, :index
@@ -64,15 +43,49 @@ defmodule DadabaseWeb.Router do
     # as long as you are also using SSL (which you should anyway).
     import Phoenix.LiveDashboard.Router
 
-    pipeline :admin_check do
-      plug :check_replit_user, allowed_ids: ["miketest3k"]
-    end
-
     scope "/dev" do
-      pipe_through [:browser, :admin_check]
+      pipe_through [:browser]
 
       live_dashboard "/dashboard", metrics: DadabaseWeb.Telemetry
       forward "/mailbox", Plug.Swoosh.MailboxPreview
+    end
+  end
+
+  ## Authentication routes
+
+  scope "/", DadabaseWeb do
+    pipe_through [:browser, :redirect_if_user_is_authenticated]
+
+    live_session :redirect_if_user_is_authenticated,
+      on_mount: [{DadabaseWeb.UserAuth, :redirect_if_user_is_authenticated}] do
+      live "/users/register", UserRegistrationLive, :new
+      live "/users/log_in", UserLoginLive, :new
+      live "/users/reset_password", UserForgotPasswordLive, :new
+      live "/users/reset_password/:token", UserResetPasswordLive, :edit
+    end
+
+    post "/users/log_in", UserSessionController, :create
+  end
+
+  scope "/", DadabaseWeb do
+    pipe_through [:browser, :require_authenticated_user]
+
+    live_session :require_authenticated_user,
+      on_mount: [{DadabaseWeb.UserAuth, :ensure_authenticated}] do
+      live "/users/settings", UserSettingsLive, :edit
+      live "/users/settings/confirm_email/:token", UserSettingsLive, :confirm_email
+    end
+  end
+
+  scope "/", DadabaseWeb do
+    pipe_through [:browser]
+
+    delete "/users/log_out", UserSessionController, :delete
+
+    live_session :current_user,
+      on_mount: [{DadabaseWeb.UserAuth, :mount_current_user}] do
+      live "/users/confirm/:token", UserConfirmationLive, :edit
+      live "/users/confirm", UserConfirmationInstructionsLive, :new
     end
   end
 end

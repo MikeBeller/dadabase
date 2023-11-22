@@ -1,7 +1,7 @@
 hidden = [".iex.exs"]
-run = "mix phx.server"
+run = "iex -S mix"
 
-entrypoint = "mix.exs"
+entrypoint = "lib/dadabase_web/controllers/page_controller.ex"
 
 [env]
 LC_ALL = "en_US.UTF-8"
@@ -15,6 +15,4 @@ channel = "stable-22_11"
 run = ["sh", "-c", "mix phx.server"]
 deploymentTarget = "cloudrun"
 
-[auth]
-pageEnabled = true
-buttonEnabled = false
+
