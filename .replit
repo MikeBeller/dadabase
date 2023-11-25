@@ -1,5 +1,5 @@
 hidden = [".iex.exs"]
-run = "iex -S mix"
+run = "iex -S mix phx.server"
 
 entrypoint = "lib/dadabase_web/controllers/page_controller.ex"
 

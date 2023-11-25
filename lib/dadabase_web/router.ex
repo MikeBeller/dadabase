@@ -13,20 +13,8 @@ defmodule DadabaseWeb.Router do
     plug :fetch_current_user
   end
 
-  pipeline :api do
-    plug :accepts, ["json"]
-  end
-
   scope "/", DadabaseWeb do
     pipe_through [:browser]
-
-    live "/", JokeLive.Index, :index
-    live "/jokes", JokeLive.Index, :index
-    live "/jokes/new", JokeLive.Index, :new
-    live "/jokes/:id/edit", JokeLive.Index, :edit
-
-    live "/jokes/:id", JokeLive.Show, :show
-    live "/jokes/:id/show/edit", JokeLive.Show, :edit
   end
 
   # Other scopes may use custom stacks.
@@ -44,7 +32,7 @@ defmodule DadabaseWeb.Router do
     import Phoenix.LiveDashboard.Router
 
     scope "/dev" do
-      pipe_through [:browser]
+      pipe_through [:browser, :require_authenticated_user]
 
       live_dashboard "/dashboard", metrics: DadabaseWeb.Telemetry
       forward "/mailbox", Plug.Swoosh.MailboxPreview
@@ -74,6 +62,14 @@ defmodule DadabaseWeb.Router do
       on_mount: [{DadabaseWeb.UserAuth, :ensure_authenticated}] do
       live "/users/settings", UserSettingsLive, :edit
       live "/users/settings/confirm_email/:token", UserSettingsLive, :confirm_email
+      
+      live "/", JokeLive.Index, :index
+      live "/jokes", JokeLive.Index, :index
+      live "/jokes/new", JokeLive.Index, :new
+      live "/jokes/:id/edit", JokeLive.Index, :edit
+
+      live "/jokes/:id", JokeLive.Show, :show
+      live "/jokes/:id/show/edit", JokeLive.Show, :edit
     end
   end
 
@@ -86,6 +82,7 @@ defmodule DadabaseWeb.Router do
       on_mount: [{DadabaseWeb.UserAuth, :mount_current_user}] do
       live "/users/confirm/:token", UserConfirmationLive, :edit
       live "/users/confirm", UserConfirmationInstructionsLive, :new
+
     end
   end
 end
